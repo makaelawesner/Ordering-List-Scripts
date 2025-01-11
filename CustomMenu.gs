@@ -2,31 +2,32 @@
 function moveTransferRows() {
   let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
   let data = dataRange.getValues();
-  let orderingQuantityColumnL = 12; // Column L (Cell from Ordering Sheet)
-  let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
+  let orderingQuantityColumn = 10; // Column J (Cell from Ordering Sheet)
+  let orderingNotesColumn = 16; // Column P (Notes from Ordering Sheet)
 
   // Prompt the user for Employee Initials
   let employee = Browser.inputBox('Enter Employee Initials');
 
   // Iterate through each row in reverse order
   for (let i = data.length - 1; i >= 0; i--) {
-    let orderingQuantityValueL = data[i][orderingQuantityColumnL - 1]; // Adjust the index for JavaScript's 0-based indexing
+    let orderingQuantityValue = data[i][orderingQuantityColumn - 1]; // Adjust the index for JavaScript's 0-based indexing
 
-    // Check if the cell contains a value in column L
-    if (orderingQuantityValueL !== "") {
+    // Check if the cell contains a value in column J
+    if (orderingQuantityValue !== "") {
       Logger.log("Found transfer on row #" + i);
       // Save the quantity for the item
-      let quantity = orderingQuantityValueL;
+      let quantity = orderingQuantityValue;
 
       // Move the values to the Transfers sheet with additional information
       Logger.log("Appending row to Transfers Sheet");
-      transfersSheet.appendRow(['', ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
+      transfersSheet.appendRow(['', ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumn - 1]]);
       
       // Add checkboxes for the Undo and Complete columns
       transfersSheet.getRange(transfersSheet.getLastRow(), 1).setDataValidation(checkBox);
       transfersSheet.getRange(transfersSheet.getLastRow(), 14).setDataValidation(checkBox);
       
       // Delete the row from the source sheet
+      Logger.log("Deleting row from Ordering Sheet");
       orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
     };
   };
@@ -41,8 +42,8 @@ function moveCompleteRows() {
   let sName = activeSheet.getSheetName();
   
   if (sName == "Ordering List") {
-    let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
-    let orderingQuantityColumnO = 15; // Column O (Cell from Ordering Sheet)
+    let orderingNotesColumn = 16; // Column P (Notes from Ordering Sheet)
+    let orderingQuantityColumn = 11; // Column K (Cell from Ordering Sheet)
     let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
     let data = dataRange.getValues();
 
@@ -51,15 +52,15 @@ function moveCompleteRows() {
 
     // Iterate through each row
     for (let i = data.length - 1; i >= 0; i--) {
-      let orderingQuantityValueO = data[i][orderingQuantityColumnO - 1]; // Adjust the index for JavaScript's 0-based indexing
+      let orderingQuantityValue = data[i][orderingQuantityColumn - 1]; // Adjust the index for JavaScript's 0-based indexing
 
-      // Check if the cell contains a value in column O
-      if (orderingQuantityValueO !== "") {
+      // Check if the cell contains a value in column K
+      if (orderingQuantityValue !== "") {
         // Save the quantity for the item
-        let quantity = orderingQuantityValueO;
+        let quantity = orderingQuantityValue;
 
         // Move the values to the "Complete" sheet with additional information
-        completeSheet.appendRow(['', ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
+        completeSheet.appendRow(['', ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumn - 1], "O"]);
 
         // Add checkboxes for the Undo column
         completeSheet.getRange(completeSheet.getLastRow(), 1).setDataValidation(checkBox);
@@ -110,7 +111,7 @@ function moveCompleteRows() {
     transfersSheet.deleteRow(transfersSheet.getLastRow());
     
     // Add a thick black border to the bottom of the final row
-    transfersSheet.getRange(transfersSheet.getLastRow(), 1, 1, transfersSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   
   } else { 
     console.log("Sheet name: " + sName)
@@ -123,23 +124,19 @@ function moveCompleteRows() {
 function moveNomoRows() {
   let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
   let data = dataRange.getValues();
-  let orderingCheckboxColumnM = 13; // Column M (Checkbox from Ordering Sheet)
+  let orderingCheckboxColumn = 15; // Column O (Checkbox from Ordering Sheet)
   
   // Iterate through each row
   for (let i = data.length - 1; i >= 0; i--) {
-    let orderingCheckboxValueM = data[i][orderingCheckboxColumnM - 1]; // Adjust the index for JavaScript's 0-based indexing
+    let orderingCheckboxValue = data[i][orderingCheckboxColumn - 1]; // Adjust the index for JavaScript's 0-based indexing
 
     // Check if the checkbox is checked in column M
-    if (orderingCheckboxValueM === true || orderingCheckboxValueM === 'TRUE') {
+    if (orderingCheckboxValue === true || orderingCheckboxValue === 'TRUE') {
       // Move the values in columns A-E to the "Transfers" sheet
       nomoSheet.appendRow([...data[i].slice(0, 5), data[i][data[i].length - 1]]);
-    }
-
-    // If checkbox is checked, delete the row from the source sheet
-    if (orderingCheckboxValueM === true || orderingCheckboxValueM === 'TRUE') {
       orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
-    }
-  }
+    };
+  };
 };
 
 function moveUndoRows() {
@@ -167,8 +164,8 @@ function moveUndoRows() {
           orderSheet.getRange(orderSheet.getLastRow(), 3, 1, 2).clearDataValidations();
 
           // Add checkboxes for the New, Nomo, and Req columns
-          orderSheet.getRange(orderSheet.getLastRow(), 10).setDataValidation(checkBox); // Column J - New
-          orderSheet.getRange(orderSheet.getLastRow(), 13).setDataValidation(checkBox); // Column M - Nomo
+          orderSheet.getRange(orderSheet.getLastRow(), 12).setDataValidation(checkBox); // Column L - New
+          orderSheet.getRange(orderSheet.getLastRow(), 15).setDataValidation(checkBox); // Column O - Nomo
           orderSheet.getRange(orderSheet.getLastRow(), 14).setDataValidation(checkBox); // Column N - Req
 
         } else if (orderOrTransferValue === 'T') {
@@ -183,8 +180,6 @@ function moveUndoRows() {
         sheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
       };
     };
-    // Add a thick black border to the bottom of the final row
-    transfersSheet.getRange(transfersSheet.getLastRow(), 1, 1, transfersSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   } else if (sheet.getName() === 'Transfers') {
     // Iterate through each row
     for (let i = data.length - 1; i >= 0; i--) {
@@ -200,8 +195,8 @@ function moveUndoRows() {
         orderSheet.getRange(orderSheet.getLastRow(), 3, 1, 2).clearDataValidations();
 
         // Add checkboxes for the New, Nomo, and Req columns
-        orderSheet.getRange(orderSheet.getLastRow(), 10).setDataValidation(checkBox); // Column J - New
-        orderSheet.getRange(orderSheet.getLastRow(), 13).setDataValidation(checkBox); // Column M - Nomo
+        orderSheet.getRange(orderSheet.getLastRow(), 12).setDataValidation(checkBox); // Column L - New
+        orderSheet.getRange(orderSheet.getLastRow(), 15).setDataValidation(checkBox); // Column O - Nomo
         orderSheet.getRange(orderSheet.getLastRow(), 14).setDataValidation(checkBox); // Column N - Req
 
         // Delete the row from the original sheet
