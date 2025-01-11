@@ -51,7 +51,7 @@ function onEditTriggerDevices(e) {
 // Updates the drop down menus for all categories and subcategories if the column containing the list is edited on the Drop Downs sheet
 function onEditUpdateDropdowns(e) {
   let editedRange = e.range;
-  let targetRangeA1Notation = 'B2:H';  // Adjust this to the desired range
+  let targetRangeA1Notation = 'B2:I';  // Adjust this to the desired range
 
   // Check if the edited cell is within the target range
   let targetRange = orderSheet.getRange(targetRangeA1Notation);
@@ -95,6 +95,10 @@ function onEditUpdateDropdowns(e) {
       Logger.log('Updating Stash Subcategories');
       stashSubs.length = 0;
       stashSubs.push(...makeArray('H', 8, dropDownSheet));
+    } else if (editedColumn == 9) {
+      Logger.log('Updating Nicotine Pouch Companies');
+      pouchCos.length = 0;
+      pouchCos.push(...makeArray('I', 9, dropDownSheet));
     }
   }
 }
@@ -208,11 +212,15 @@ function onEditFormatRules(e) {
 
     let products = transposeData();
     let indices = checkForDuplicateRow(e, products);
-    highlightDuplicateRows(indices.originalRowIndex, indices.duplicateRowIndex);
+    highlightDuplicateRows(indices.originalRowIndex, indices.duplicateRowIndex, duplicateColor);
+
+    let transferProducts = transposeTransfers();
+    let transferIndices = checkForDuplicateRow(e, transferProducts);
+    highlightDuplicateRows(transferIndices.originalRowIndex, transferIndices.duplicateRowIndex, transferColor);
 
     let nomoProducts = transposeNomos();
     let nomoIndices = checkForDuplicateRow(e, nomoProducts);
-    highlightDupicateNomos(nomoIndices.originalRowIndex, nomoIndices.duplicateRowIndex);
+    highlightDuplicateRows(nomoIndices.originalRowIndex, nomoIndices.duplicateRowIndex, nomoColor);
     
   } else if (column == 9 && row > 1) {  // If the order date cell is filled, strikes through the row
     Logger.log("Strikethrough check triggered");
@@ -230,7 +238,7 @@ function onEditFormatRules(e) {
       highlightCheckForBoxes(checkedColumn, row);
     }
 
-  } else if (column == 10) {  // If the "New" checkbox is checked, highlights the row
+  } else if (column == 12) {  // If the "New" checkbox is checked, highlights the row
     Logger.log('New check triggered')
     if (range.isChecked()) {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor); // Change the background color as needed
@@ -238,16 +246,16 @@ function onEditFormatRules(e) {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
 
-  } else if (column == 12) {  // If the "Transfer" cell has a value, highlights the row
+  } else if (column == 10) {  // If the "Transfer" cell has a value, highlights the row
     Logger.log('Transfer check triggered')
-    let valueL = orderSheet.getRange(row, 12).getValue(); // Value in column L
+    let valueL = orderSheet.getRange(row, 10).getValue(); // Value in column L
     if (valueL !== "") {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor); // Change the background color as needed
     } else {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
 
-  } else if (column == 13) {  // If the "Nomo" checkbox is checked, highlights the row
+  } else if (column == 15) {  // If the "Nomo" checkbox is checked, highlights the row
     Logger.log('Nomo check triggered');
     if (range.isChecked()) {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor); // Change the background color as needed
@@ -263,9 +271,9 @@ function onEditFormatRules(e) {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
     
-  } else if (column == 15) {  // If the "Complete" cell has a value, highlights the row
-    Logger.log('Transfer check triggered');
-    let valueO = orderSheet.getRange(row, 15).getValue(); // Value in column O
+  } else if (column == 11) {  // If the "Complete" cell has a value, highlights the row
+    Logger.log('Complete check triggered');
+    let valueO = orderSheet.getRange(row, 11).getValue(); // Value in column 
     if (valueO !== "") {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor); // Change the background color as needed
     } else {
