@@ -49,8 +49,8 @@ function createCheckBoxes(currentRow) {
   Logger.log("createCheckBoxes function triggered");
   
   // Gets the location of the cells in columns J, L, M, N, and O
-  let newTargetCell = orderSheet.getRange('J' + currentRow.toString()); // Column J
-  let nomoTargetCell = orderSheet.getRange('M' + currentRow.toString()); // Column M
+  let newTargetCell = orderSheet.getRange('L' + currentRow.toString()); // Column L
+  let nomoTargetCell = orderSheet.getRange('O' + currentRow.toString()); // Column O
   let reqTargetCell = orderSheet.getRange('N' + currentRow.toString()); // Colmun N
 
   // Applies the checkboxes to the target cells in the appropriate columns
@@ -73,6 +73,8 @@ function findBrands(category) {
     brands.push(...eLiquid);
   } else if (category == 'CBD' || category == 'Delta 8' || category == 'Herbal') {
     brands.push(...deltaCos);
+  } else if (category == 'Nicotine Pouches') {
+    brands.push(...pouchCos);
   }
   return brands;
 };
@@ -280,6 +282,36 @@ function transposeNomos() {
   return nomos;
 };
 
+// Function to transpose five columns of the spreadsheet into an object, excluding empty rows and converting values to lowercase
+function transposeTransfers() {
+  Logger.log("transposeTransfers function triggered");
+  let transferProducts = {};
+
+  let range = transfersSheet.getRange("B:F"); // Adjust the range as needed
+  let values = range.getValues();
+
+  // Iterate through the rows
+  for (let i = 0; i < values.length; i++) {
+    let row = values[i];
+
+    // Check if the row contains any non-empty values
+    if (row.some(cell => cell !== "" && cell !== null)) {
+      // Create an object to store data for each row
+      let rowData = {
+        column1: row[0] !== null ? row[0].toString().toLowerCase() : "",
+        column2: row[1] !== null ? row[1].toString().toLowerCase() : "",
+        column3: row[2] !== null ? row[2].toString().toLowerCase() : "",
+        column4: row[3] !== null ? row[3].toString().toLowerCase() : "",
+        column5: row[4] !== null ? row[4].toString().toLowerCase() : ""
+      };
+
+      // Store the row data in the object using row number as key
+      transferProducts["row" + (i + 1)] = rowData;
+    };
+  };
+  return transferProducts;
+};
+
 // Checks for duplicate listings when a new item is added - if a duplicate is found it returns the row index of the original and duplicate rows
 function checkForDuplicateRow(e, products) {
   Logger.log("checkForDuplicateRow function triggered");
@@ -329,30 +361,8 @@ function checkForDuplicateRow(e, products) {
 };
 
 // Takes the indices returned by the checkForDuplicateRow function, and highlights the row based on the index returned for duplicate rows on the Order Sheet
-// Originally also highlighted the original row, but have commented that functionality out until/unless we decide to keep it
-function highlightDuplicateRows(originalRowIndex, duplicateRowIndex) {
+function highlightDuplicateRows(originalRowIndex, duplicateRowIndex, highlightColor) {
   Logger.log("highlightDuplicateRows function triggered");
-  // Ensure valid row indices are provided
-  if (originalRowIndex === -1 || duplicateRowIndex === -1) {
-    Logger.log("Invalid row indices provided.");
-    return;
-  }
-  // Highlight original row - Commented out since it seems we may not need this 
-  //let originalRowRange = orderSheet.getRange(originalRowIndex, 1, 1, orderSheet.getLastColumn());
-  //originalRowRange.setBackground(duplicateColor);
-
-  // Highlight duplicate row
-  let duplicateRowRange = orderSheet.getRange(duplicateRowIndex, 1, 1, orderSheet.getLastColumn());
-  duplicateRowRange.setBackground(duplicateColor);
-
-  //Logger.log("Original row highlighted: " + originalRowIndex);
-  Logger.log("Duplicate row highlighted: " + duplicateRowIndex);
-};
-
-// Takes the indices returned by the checkForDuplicateRow function, and highlights the row based on the index returned for duplicate rows from the Nomo Sheet
-function highlightDupicateNomos(originalRowIndex, duplicateRowIndex) {
-  Logger.log('highlightDuplicateNomos function triggered');
-  // Ensure valid row indices are provided
   if (originalRowIndex === -1 || duplicateRowIndex === -1) {
     Logger.log("Invalid row indices provided.");
     return;
@@ -360,11 +370,11 @@ function highlightDupicateNomos(originalRowIndex, duplicateRowIndex) {
 
   // Highlight duplicate row
   let duplicateRowRange = orderSheet.getRange(duplicateRowIndex, 1, 1, orderSheet.getLastColumn());
-  duplicateRowRange.setBackground(nomoColor);
+  duplicateRowRange.setBackground(highlightColor);
 
-  //Logger.log("Original row highlighted: " + originalRowIndex);
   Logger.log("Duplicate row highlighted: " + duplicateRowIndex);
 };
+
 
 // Compares the order date to today's date, and if the date is older than 14 days, the cells will be highlighted
 function compareDates(valueInColumnI, row) {
@@ -443,9 +453,9 @@ function parseDate(dateStr) {
   return date;
 };
 
-// Function to check if any checkboxes in columns J, M, and N are checked for a given row and return the column number of the first checked checkbox
+// Function to check if any checkboxes in columns A, L, N, and O are checked for a given row and return the column number of the first checked checkbox
 function checkCheckboxesInRow(row) {
-  let columnsToCheck = [10, 13, 14]; // Columns J, M, N
+  let columnsToCheck = [1, 12, 14, 15]; // Columns A, L, N, O
   for (let i = 0; i < columnsToCheck.length; i++) {
     let col = columnsToCheck[i];
     let cell = orderSheet.getRange(row, col);
@@ -461,19 +471,19 @@ function checkCheckboxesInRow(row) {
 
 // Function to highlight based on checked column
 function highlightCheckForBoxes(checkedColumn, row) {
-  if (checkedColumn == 10) {  // If the "New" checkbox is checked, highlights the row
+  if (checkedColumn == 12) {  // If the "New" checkbox is checked, highlights the row
     Logger.log('New check triggered');
     orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor);
-  } else if (checkedColumn == 12) {
+  } else if (checkedColumn == 10) {
     Logger.log('Transfer check triggered');
     orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor);
-  } else if (checkedColumn == 13) {
+  } else if (checkedColumn == 15) {
     Logger.log('Nomo check triggered');
     orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor);
   } else if (checkedColumn == 14) {
     Logger.log('Req check triggered');
     orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(reqColor);
-  } else if (checkedColumn == 15) {
+  } else if (checkedColumn == 11) {
     Logger.log('Complete check triggered');
     orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor);
   };
