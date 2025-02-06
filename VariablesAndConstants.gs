@@ -1,7 +1,6 @@
 // Gets the active spreadsheet and all sheets within the spreadsheet
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const orderSheet = ss.getSheetByName('Ordering List');
-  const mfForNpVendingSheet = ss.getSheetByName("MF for NP Vending");
   const mfForNpSheet = ss.getSheetByName("MF for NP");
   const requestSheet = ss.getSheetByName('Requests');
   const transfersSheet = ss.getSheetByName('Transfers');
@@ -34,15 +33,18 @@
   const oldColor = '#fad1a5';
 
 // Initiates drop-down menu arrays - should only need to be run once, then the onEdit functions will keep the drop-down menus up to date.
+
+// Subcategory Options
   let deltaCos = makeArray('B', 2, dropDownSheet);
   let vapeCos = makeArray('C', 3, dropDownSheet);
-  let eLiquid = makeArray('D', 4, dropDownSheet);
+  let eLiquidCos = makeArray('D', 4, dropDownSheet);
   let dispoCos = makeArray('E', 5, dropDownSheet);
   let accessoriesSubs = makeArray('F', 6, dropDownSheet);
   let deltaSubs = makeArray('G', 7, dropDownSheet);
   let stashSubs = makeArray('H', 8, dropDownSheet);
   let pouchCos = makeArray('I', 9, dropDownSheet);
 
+// Device Options
   let aspireDevs = makeArray('A', 1, deviceSheet);
   let dazzleafDevs = makeArray('B', 2, deviceSheet);
   let freemaxDevs = makeArray('C', 3, deviceSheet);
