@@ -206,7 +206,7 @@ function moveUndoRows() {
   };
 };
 
-// Sorts the data alphabetically
+// Sorts the data alphabetically based on the active sheet
 function alphabeticalSort() {
   let sName = activeSheet.getSheetName();
   let range;
@@ -269,13 +269,12 @@ function alphabeticalSort() {
   }
 };
 
-// Creates the custom menu option to run the custom functions
+// Creates the custom menu with options to run custom functions
 function onOpen() {
   let ui = SpreadsheetApp.getUi();
   ui.createMenu('Custom Menu')
     .addItem('Alphabetical Sort', 'alphabeticalSort')
     .addItem('Move Transfers', 'moveTransferRows')
-    //.addItem('Move MF for NP Vending Transfers', 'moveVendingTransfers') | WORK IN PROGRESS
     .addItem('Move Nomo Rows', 'moveNomoRows')
     .addItem('Move Completed Rows', 'moveCompleteRows')
     .addItem('Undo Moved Rows', 'moveUndoRows')
