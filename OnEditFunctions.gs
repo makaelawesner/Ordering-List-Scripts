@@ -308,9 +308,9 @@ function insertNPListDate(e) {
     };
     
     if (e.range.getColumn() >= 12 && e.range.getColumn() <= 18) { // Venice's Complete range
-      if (!completeDateValue && !editedValue) { // (complete date WAS empty) AND (edited cell IS empty)
-      } else if (!completeDateValue && editedValue) { // (complete date WAS empty) AND (the edited cell IS NOT empty)
+      if (!completeDateValue && editedValue) { // (complete date WAS empty) AND (the edited cell IS NOT empty)
         completeDateCell.setValue(formattedDate); // insert today's date in the Complete column
+        mfForNpSheet.getRange(currentRow, 12, 1, 6).setFontLine("line-through")
       };
     };
 
