@@ -4,8 +4,8 @@ function moveAndClearCompleteSheet() {
   let dateOnly = today.toISOString().split('T')[0]; // Only want the date without the time
 
   // Open the source and destination spreadsheets
-  let sourceSpreadsheet = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/19rV2sw-JVJaYHYmG0xC5FrpqE9uGjKYKOdBOiwvBxI4/edit#gid=240309260");
-  let destinationSpreadsheet = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1NtwzZ3Q9BqjNHmfY1E7cC5u3-PmZhSj-5nUtyTRbDC8/edit#gid=0");
+  let sourceSpreadsheet = SpreadsheetApp.openByUrl("REMOVEDFORPRIVACY");
+  let destinationSpreadsheet = SpreadsheetApp.openByUrl("REMOVEDFORPRIVACY");
 
   // Get the data from the source sheet
   let sourceSheet = sourceSpreadsheet.getSheetByName("Complete");
